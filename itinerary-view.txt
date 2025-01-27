@@ -1,0 +1,277 @@
+// components/dashboard/ItineraryView.jsx
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Clock,
+  Coffee,
+  Utensils,
+  Bus,
+  Hotel,
+  Mountain,
+  Camera,
+  Sun,
+  Moon,
+  MapPin,
+  Backpack,
+  Thermometer,
+  Droplets,
+  Wind
+} from 'lucide-react';
+
+const ItineraryView = () => {
+  const itinerary = [
+    {
+      day: 1,
+      date: "31-May",
+      title: "Departure & Surabaya City Tour",
+      locations: ["Surabaya"],
+      weather: {
+        temperature: "25-32°C",
+        humidity: "High",
+        conditions: "Partly cloudy"
+      },
+      generalPreparation: [
+        "Wear comfortable walking shoes",
+        "Bring umbrella or rain jacket",
+        "Carry water bottle"
+      ],
+      activities: [
+        {
+          time: "05:30",
+          type: "transport",
+          title: "Assembly at Terminal 3",
+          description: "Check-in and luggage collection",
+          duration: "30 mins",
+          icon: Bus,
+          equipment: [
+            { name: "Passport", required: true },
+            { name: "Travel documents", required: true },
+            { name: "Cash/cards", required: true }
+          ],
+          preparation: "Arrive 15 minutes early for smooth check-in"
+        },
+        {
+          time: "14:00",
+          type: "sightseeing",
+          title: "Surabaya City Tour",
+          description: "Visit to historical sites and local markets",
+          duration: "3 hours",
+          icon: Camera,
+          equipment: [
+            { name: "Camera", required: false },
+            { name: "Sun hat", required: false },
+            { name: "Small backpack", required: true },
+            { name: "Water bottle", required: true }
+          ],
+          preparation: "Wear modest clothing for temple visits"
+        }
+      ]
+    },
+    {
+      day: 2,
+      date: "01-Jun",
+      title: "Mount Ijen Adventure",
+      locations: ["Mount Ijen"],
+      weather: {
+        temperature: "12-20°C",
+        humidity: "Moderate",
+        conditions: "Clear night/morning"
+      },
+      generalPreparation: [
+        "Get adequate rest the day before",
+        "Pack warm layers",
+        "Charge all electronics"
+      ],
+      activities: [
+        {
+          time: "00:00",
+          type: "activity",
+          title: "Midnight Start",
+          description: "Prepare for Mount Ijen hike",
+          duration: "30 mins",
+          icon: Moon,
+          equipment: [
+            { name: "Hiking boots", required: true },
+            { name: "Warm jacket", required: true },
+            { name: "Headlamp", required: true },
+            { name: "Gas mask (provided)", required: true },
+            { name: "Gloves", required: true },
+            { name: "Walking stick", required: false }
+          ],
+          preparation: "Wear multiple layers of clothing for varying temperatures"
+        },
+        {
+          time: "01:00",
+          type: "activity",
+          title: "Mount Ijen Hike",
+          description: "Trek to see the blue fire phenomenon",
+          duration: "3 hours",
+          icon: Mountain,
+          equipment: [
+            { name: "Water (min 1L)", required: true },
+            { name: "Energy snacks", required: true },
+            { name: "Camera", required: false },
+            { name: "First aid kit", required: false }
+          ],
+          preparation: "Have a light meal before starting the hike"
+        }
+      ]
+    }
+  ];
+
+  const WeatherInfo = ({ weather }) => (
+    <div className="flex gap-4 p-4 bg-gray-50 rounded-lg mb-4">
+      <div className="flex items-center gap-2">
+        <Thermometer className="w-4 h-4 text-blue-600" />
+        <span>{weather.temperature}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Droplets className="w-4 h-4 text-blue-600" />
+        <span>{weather.humidity}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Wind className="w-4 h-4 text-blue-600" />
+        <span>{weather.conditions}</span>
+      </div>
+    </div>
+  );
+
+  const ActivityCard = ({ activity }) => {
+    const Icon = activity.icon;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-gray-50">
+          <div className="flex-shrink-0">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <Icon className="w-5 h-5 text-blue-600" />
+            </div>
+          </div>
+          <div className="flex-grow min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-medium">{activity.time}</span>
+              <Badge variant="outline">{activity.duration}</Badge>
+            </div>
+            <h4 className="font-medium mb-1">{activity.title}</h4>
+            <p className="text-sm text-gray-500">{activity.description}</p>
+          </div>
+        </div>
+
+        <div className="pl-14">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="equipment">
+              <AccordionTrigger className="text-sm">
+                Equipment & Preparation
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4">
+                  {activity.equipment && (
+                    <div>
+                      <h5 className="font-medium mb-2 text-sm">Required Equipment</h5>
+                      <div className="grid grid-cols-2 gap-2">
+                        {activity.equipment.map((item, index) => (
+                          <div 
+                            key={index} 
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <Backpack className="w-4 h-4 text-blue-600" />
+                            <span>{item.name}</span>
+                            {item.required && (
+                              <Badge variant="secondary" className="text-xs">Required</Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activity.preparation && (
+                    <div>
+                      <h5 className="font-medium mb-2 text-sm">Preparation</h5>
+                      <p className="text-sm text-gray-600">{activity.preparation}</p>
+                    </div>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
+    );
+  };
+
+  const DayCard = ({ day }) => (
+    <Card className="mb-4">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              Day {day.day} - {day.title}
+              <Badge>{day.date}</Badge>
+            </CardTitle>
+            <CardDescription className="flex items-center gap-1 mt-1">
+              <MapPin className="w-4 h-4" />
+              {day.locations.join(' → ')}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <WeatherInfo weather={day.weather} />
+        
+        {day.generalPreparation && (
+          <div className="mb-4">
+            <h4 className="font-medium mb-2">General Preparation</h4>
+            <ul className="list-disc pl-4 space-y-1">
+              {day.generalPreparation.map((prep, index) => (
+                <li key={index} className="text-sm text-gray-600">{prep}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="activities">
+            <AccordionTrigger>View Detailed Schedule</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-4">
+                {day.activities.map((activity, index) => (
+                  <ActivityCard key={index} activity={activity} />
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Trip Itinerary</h2>
+          <p className="text-gray-500">Day by day schedule with preparation details</p>
+        </div>
+        <Button variant="outline">
+          Download PDF
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        {itinerary.map((day) => (
+          <DayCard key={day.day} day={day} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default ItineraryView;

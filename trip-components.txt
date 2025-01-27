@@ -1,0 +1,277 @@
+// components/SeatSelection.jsx
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const SeatSelection = ({ onSeatSelect }) => {
+  const [selectedBus, setSelectedBus] = useState('');
+  const [selectedSeat, setSelectedSeat] = useState(null);
+  
+  // Mock data for seats
+  const busSeats = {
+    bus1: Array(32).fill().map((_, i) => ({
+      id: i + 1,
+      isBooked: Math.random() > 0.7,
+      isSelected: false
+    })),
+    bus2: Array(32).fill().map((_, i) => ({
+      id: i + 1,
+      isBooked: Math.random() > 0.7,
+      isSelected: false
+    }))
+  };
+
+  const handleSeatClick = (seatId) => {
+    if (!selectedBus) return;
+    const seat = busSeats[selectedBus].find(s => s.id === seatId);
+    if (seat && !seat.isBooked) {
+      setSelectedSeat(seatId);
+      onSeatSelect({ bus: selectedBus, seat: seatId });
+    }
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Select Your Seat</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <Select value={selectedBus} onValueChange={setSelectedBus}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select bus" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="bus1">Bus 1</SelectItem>
+              <SelectItem value="bus2">Bus 2</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {selectedBus && (
+            <div className="grid grid-cols-4 gap-4">
+              {busSeats[selectedBus].map((seat) => (
+                <Button
+                  key={seat.id}
+                  variant={seat.isBooked ? "secondary" : selectedSeat === seat.id ? "default" : "outline"}
+                  disabled={seat.isBooked}
+                  onClick={() => handleSeatClick(seat.id)}
+                  className="h-12 w-full"
+                >
+                  {seat.id}
+                </Button>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2 text-sm">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-primary rounded-full"></div>
+              <span>Selected</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-secondary rounded-full"></div>
+              <span>Booked</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 border rounded-full"></div>
+              <span>Available</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// components/AccommodationSelection.jsx
+import React, { useState } from 'react';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle,
+  CardDescription 
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const AccommodationSelection = ({ onRoomSelect }) => {
+  const [selectedHotel, setSelectedHotel] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState(null);
+
+  // Mock data for hotels and rooms
+  const hotels = {
+    riverside: {
+      name: "Riverside Hotel",
+      rooms: [
+        { id: "R101", type: "Twin", available: true },
+        { id: "R102", type: "Double", available: false },
+        { id: "R103", type: "Twin", available: true },
+        { id: "R104", type: "Double", available: true },
+      ]
+    },
+    doho: {
+      name: "Doho Hotel",
+      rooms: [
+        { id: "D201", type: "Twin", available: true },
+        { id: "D202", type: "Twin", available: true },
+        { id: "D203", type: "Double", available: false },
+        { id: "D204", type: "Double", available: true },
+      ]
+    }
+  };
+
+  const handleHotelSelect = (hotelId) => {
+    setSelectedHotel(hotelId);
+    setSelectedRoom(null);
+  };
+
+  const handleRoomSelect = (roomId) => {
+    setSelectedRoom(roomId);
+    const hotel = hotels[selectedHotel];
+    const room = hotel.rooms.find(r => r.id === roomId);
+    onRoomSelect({ hotel: selectedHotel, room: roomId, type: room.type });
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Select Your Accommodation</CardTitle>
+        <CardDescription>Choose your preferred hotel and room</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label>Select Hotel</Label>
+            <RadioGroup
+              value={selectedHotel}
+              onValueChange={handleHotelSelect}
+              className="grid grid-cols-2 gap-4"
+            >
+              {Object.entries(hotels).map(([id, hotel]) => (
+                <Label
+                  key={id}
+                  className={`flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary ${
+                    selectedHotel === id ? 'border-primary' : ''
+                  }`}
+                >
+                  <RadioGroupItem value={id} className="sr-only" />
+                  <span className="text-sm font-medium">{hotel.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {hotel.rooms.filter(r => r.available).length} rooms available
+                  </span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
+
+          {selectedHotel && (
+            <div className="space-y-2">
+              <Label>Select Room</Label>
+              <div className="grid grid-cols-2 gap-4">
+                {hotels[selectedHotel].rooms.map((room) => (
+                  <Button
+                    key={room.id}
+                    variant={selectedRoom === room.id ? "default" : "outline"}
+                    disabled={!room.available}
+                    onClick={() => handleRoomSelect(room.id)}
+                    className="h-20 w-full"
+                  >
+                    <div className="text-sm space-y-1">
+                      <div>{room.id}</div>
+                      <div className="text-xs">{room.type}</div>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// components/ParticipantConfirmation.jsx
+import React from 'react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Check } from 'lucide-react';
+
+const ParticipantConfirmation = ({ formData }) => {
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Review Your Registration</CardTitle>
+        <CardDescription>Please review your details before confirming</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-4">
+          <Alert>
+            <Check className="h-4 w-4" />
+            <AlertTitle>Personal Information</AlertTitle>
+            <AlertDescription>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div>
+                  <span className="font-medium">Name:</span> {formData.fullName}
+                </div>
+                <div>
+                  <span className="font-medium">Title:</span> {formData.title}
+                </div>
+                <div>
+                  <span className="font-medium">Gender:</span> {formData.gender}
+                </div>
+                <div>
+                  <span className="font-medium">Flight:</span> {formData.flightNumber || 'N/A'}
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
+
+          <Alert>
+            <Check className="h-4 w-4" />
+            <AlertTitle>Transportation</AlertTitle>
+            <AlertDescription>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div>
+                  <span className="font-medium">Bus:</span> {formData.busNumber}
+                </div>
+                <div>
+                  <span className="font-medium">Seat:</span> {formData.seatNumber}
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
+
+          <Alert>
+            <Check className="h-4 w-4" />
+            <AlertTitle>Accommodation</AlertTitle>
+            <AlertDescription>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div>
+                  <span className="font-medium">Hotel:</span> {formData.hotel}
+                </div>
+                <div>
+                  <span className="font-medium">Room:</span> {formData.roomNumber}
+                </div>
+                <div>
+                  <span className="font-medium">Room Type:</span> {formData.roomType}
+                </div>
+                <div>
+                  <span className="font-medium">Roommate:</span> {formData.roommate}
+                </div>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </div>
+
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline">Edit Details</Button>
+          <Button>Confirm Registration</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export { SeatSelection, AccommodationSelection, ParticipantConfirmation };

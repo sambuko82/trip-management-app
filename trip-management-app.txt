@@ -1,0 +1,225 @@
+// App.jsx
+import React from 'react';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs"
+import { MapPin, Calendar, Users, Bus } from 'lucide-react';
+
+const App = () => {
+  const [currentStep, setCurrentStep] = useState('landing');
+  const [formData, setFormData] = useState({
+    participantNumber: '',
+    title: '',
+    fullName: '',
+    gender: '',
+    flightNumber: '',
+    roommate: '',
+    roomType: '',
+    foodAllergies: '',
+    tShirtSize: '',
+    medicalNeeds: '',
+    busNumber: '',
+    seatNumber: '',
+  });
+
+  const TripHeader = () => (
+    <div className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-2">JVTO-910 - Lem Poay Yee</h1>
+        <div className="flex items-center gap-4 text-sm">
+          <span className="flex items-center gap-1">
+            <Calendar className="w-4 h-4" />
+            31-May - 04-Jun
+          </span>
+          <span className="flex items-center gap-1">
+            <MapPin className="w-4 h-4" />
+            Surabaya, Mount Ijen, Tumpak Sewu Waterfall, Mount Bromo
+          </span>
+          <span className="flex items-center gap-1">
+            <Users className="w-4 h-4" />
+            32 PAX
+          </span>
+          <span className="flex items-center gap-1">
+            <Bus className="w-4 h-4" />
+            5D 4N
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const LandingPage = () => (
+    <div className="min-h-screen flex flex-col">
+      <TripHeader />
+      <div className="flex-1 max-w-5xl mx-auto w-full p-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Trip Features</CardTitle>
+              <CardDescription>Included in your package</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Bus className="w-5 h-5 text-blue-600" />
+                  <span>AC Transport</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  <span>Tour Guide</span>
+                </div>
+                {/* Add more features */}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>Register or view your trip details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button 
+                className="w-full"
+                onClick={() => setCurrentStep('registration')}
+              >
+                Register Now
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setCurrentStep('dashboard')}
+              >
+                View Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+
+  const RegistrationForm = () => (
+    <div className="min-h-screen flex flex-col">
+      <TripHeader />
+      <div className="flex-1 max-w-3xl mx-auto w-full p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Registration Form</CardTitle>
+            <CardDescription>Please fill in your details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="personal">Personal Info</TabsTrigger>
+                <TabsTrigger value="transport">Transport</TabsTrigger>
+                <TabsTrigger value="accommodation">Accommodation</TabsTrigger>
+              </TabsList>
+              <TabsContent value="personal">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Title</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select title" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="bapak">Bapak</SelectItem>
+                          <SelectItem value="ibu">Ibu</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="gender">Gender</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input id="fullName" placeholder="Enter your full name" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="flightNumber">Flight Number (Optional)</Label>
+                    <Input id="flightNumber" placeholder="Enter flight number" />
+                  </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="transport">
+                <SeatSelection 
+                  onSeatSelect={(selection) => {
+                    setFormData({
+                      ...formData,
+                      busNumber: selection.bus,
+                      seatNumber: selection.seat
+                    });
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="accommodation">
+                <AccommodationSelection 
+                  onRoomSelect={(selection) => {
+                    setFormData({
+                      ...formData,
+                      hotel: selection.hotel,
+                      roomNumber: selection.room,
+                      roomType: selection.type
+                    });
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // Render the appropriate component based on current step
+  const renderStep = () => {
+    switch (currentStep) {
+      case 'landing':
+        return <LandingPage />;
+      case 'registration':
+        return <RegistrationForm />;
+      default:
+        return <LandingPage />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {renderStep()}
+    </div>
+  );
+};
+
+export default App;

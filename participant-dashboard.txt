@@ -1,0 +1,334 @@
+// components/dashboard/ParticipantDashboard.jsx
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { MapPin, Calendar, Users, Bus, Bell, AlertCircle } from 'lucide-react';
+
+const ParticipantDashboard = () => {
+  // Mock participant data
+  const [participantData, setParticipantData] = useState({
+    personalInfo: {
+      name: "John Doe",
+      participantNumber: "P001",
+      title: "Bapak",
+      gender: "Male",
+      flightNumber: "SQ722",
+      tShirtSize: "L",
+      status: "Confirmed"
+    },
+    transportation: {
+      busNumber: "Bus 1",
+      seatNumber: "12",
+      pickupPoint: "Terminal 3",
+      pickupTime: "05:30 AM"
+    },
+    accommodation: {
+      hotel: "Riverside Hotel",
+      roomNumber: "R101",
+      roomType: "Twin",
+      roommate: "Jane Smith",
+      checkIn: "31-May",
+      checkOut: "04-Jun"
+    },
+    notifications: [
+      {
+        id: 1,
+        type: "info",
+        message: "Your T-shirt is ready for collection",
+        date: "2024-01-25"
+      },
+      {
+        id: 2,
+        type: "important",
+        message: "Please complete your medical form",
+        date: "2024-01-24"
+      }
+    ]
+  });
+
+  const [isChangeRequestOpen, setIsChangeRequestOpen] = useState(false);
+  const [changeRequest, setChangeRequest] = useState({
+    type: '',
+    reason: '',
+    details: ''
+  });
+
+  const DashboardHeader = () => (
+    <div className="mb-6">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">Welcome, {participantData.personalInfo.name}</h1>
+          <p className="text-gray-500">Participant #{participantData.personalInfo.participantNumber}</p>
+        </div>
+        <Badge variant={participantData.personalInfo.status === "Confirmed" ? "success" : "warning"}>
+          {participantData.personalInfo.status}
+        </Badge>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-blue-600" />
+              <span>31-May - 04-Jun</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              <Bus className="w-4 h-4 text-blue-600" />
+              <span>Bus {participantData.transportation.busNumber}</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-blue-600" />
+              <span>{participantData.accommodation.hotel}</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-600" />
+              <span>Room {participantData.accommodation.roomNumber}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const PersonalInfoSection = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Personal Information</CardTitle>
+        <CardDescription>Your registered details</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Name</Label>
+            <p className="text-sm">{participantData.personalInfo.name}</p>
+          </div>
+          <div>
+            <Label>Title</Label>
+            <p className="text-sm">{participantData.personalInfo.title}</p>
+          </div>
+          <div>
+            <Label>Gender</Label>
+            <p className="text-sm">{participantData.personalInfo.gender}</p>
+          </div>
+          <div>
+            <Label>Flight Number</Label>
+            <p className="text-sm">{participantData.personalInfo.flightNumber}</p>
+          </div>
+          <div>
+            <Label>T-Shirt Size</Label>
+            <p className="text-sm">{participantData.personalInfo.tShirtSize}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const TransportationSection = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Transportation Details</CardTitle>
+        <CardDescription>Your bus and seat allocation</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Bus Number</Label>
+            <p className="text-sm">{participantData.transportation.busNumber}</p>
+          </div>
+          <div>
+            <Label>Seat Number</Label>
+            <p className="text-sm">{participantData.transportation.seatNumber}</p>
+          </div>
+          <div>
+            <Label>Pickup Point</Label>
+            <p className="text-sm">{participantData.transportation.pickupPoint}</p>
+          </div>
+          <div>
+            <Label>Pickup Time</Label>
+            <p className="text-sm">{participantData.transportation.pickupTime}</p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Dialog open={isChangeRequestOpen} onOpenChange={setIsChangeRequestOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Request Seat Change</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Request Seat Change</DialogTitle>
+                <DialogDescription>
+                  Submit your request for a seat change. Our team will review it.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Reason for Change</Label>
+                  <Input
+                    value={changeRequest.reason}
+                    onChange={(e) => setChangeRequest({...changeRequest, reason: e.target.value})}
+                    placeholder="Enter your reason"
+                  />
+                </div>
+                <div>
+                  <Label>Preferred Seat (Optional)</Label>
+                  <Input
+                    value={changeRequest.details}
+                    onChange={(e) => setChangeRequest({...changeRequest, details: e.target.value})}
+                    placeholder="Enter preferred seat number"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsChangeRequestOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => {
+                  // Handle change request submission
+                  setIsChangeRequestOpen(false);
+                  setChangeRequest({ type: '', reason: '', details: '' });
+                }}>
+                  Submit Request
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const AccommodationSection = () => (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Accommodation Details</CardTitle>
+        <CardDescription>Your hotel and room allocation</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Hotel</Label>
+            <p className="text-sm">{participantData.accommodation.hotel}</p>
+          </div>
+          <div>
+            <Label>Room Number</Label>
+            <p className="text-sm">{participantData.accommodation.roomNumber}</p>
+          </div>
+          <div>
+            <Label>Room Type</Label>
+            <p className="text-sm">{participantData.accommodation.roomType}</p>
+          </div>
+          <div>
+            <Label>Roommate</Label>
+            <p className="text-sm">{participantData.accommodation.roommate}</p>
+          </div>
+          <div>
+            <Label>Check-in</Label>
+            <p className="text-sm">{participantData.accommodation.checkIn}</p>
+          </div>
+          <div>
+            <Label>Check-out</Label>
+            <p className="text-sm">{participantData.accommodation.checkOut}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const NotificationsSection = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>Recent updates and announcements</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {participantData.notifications.map((notification) => (
+            <Alert key={notification.id}>
+              {notification.type === "important" ? (
+                <AlertCircle className="h-4 w-4" />
+              ) : (
+                <Bell className="h-4 w-4" />
+              )}
+              <AlertTitle>{notification.type === "important" ? "Important" : "Notification"}</AlertTitle>
+              <AlertDescription>
+                <div className="flex justify-between items-start">
+                  <span>{notification.message}</span>
+                  <span className="text-sm text-gray-500">{notification.date}</span>
+                </div>
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <DashboardHeader />
+        
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
+            <TabsTrigger value="transportation">Transportation</TabsTrigger>
+            <TabsTrigger value="accommodation">Accommodation</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <div className="grid gap-6">
+              <PersonalInfoSection />
+              <TransportationSection />
+              <AccommodationSection />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="transportation">
+            <TransportationSection />
+          </TabsContent>
+
+          <TabsContent value="accommodation">
+            <AccommodationSection />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <NotificationsSection />
+          </TabsContent>
+
+          <TabsContent value="itinerary">
+            <ItineraryView />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default ParticipantDashboard;
